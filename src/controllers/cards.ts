@@ -11,7 +11,12 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
   Card.findByIdAndDelete(req.params.cardId)
     .orFail(() => new NotFoundError('Карточка с указанным _id не найдена'))
     .then(() => res.send({ message: 'Карточка удалена' }))
-    .catch(next);
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        return next(new BadRequestError('Передан несуществующий _id карточки'));
+      }
+      return next(error);
+    });
 };
 
 export const createCard = (req: Request, res: Response, next: NextFunction) => {

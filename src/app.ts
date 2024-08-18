@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import userRouter from './routes/users';
 import cardRouter from './routes/cards';
 import errorHandler from './errors/errorHandler';
-import notFoundHandler from './errors/errorHandler';
+import NotFoundError from './errors/notFoundError';
 
 const { PORT = 3000 } = process.env;
 
@@ -31,8 +31,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
-app.use(notFoundHandler);
-app.use(errorHandler);
+app.use('*', (req: Request, res: Response, next: NextFunction) => {
+  next(new NotFoundError('Страница с таким url не найдена.'));
+}); app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
