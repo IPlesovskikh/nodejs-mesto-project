@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import userRouter from './routes/users';
 import cardRouter from './routes/cards';
 import errorHandler from './errors/errorHandler';
+import notFoundHandler from './errors/errorHandler';
 
 const { PORT = 3000 } = process.env;
 
@@ -30,6 +31,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
+app.use(notFoundHandler);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
