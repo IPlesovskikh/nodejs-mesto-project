@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
-import { celebrate, Joi } from 'celebrate';
+import { celebrate, Joi, errors } from 'celebrate';
 import { login, createUser } from './controllers/users';
 import auth from './middlewares/auth';
 import { errLogger, reqLogger } from './middlewares/logger';
@@ -51,6 +51,7 @@ app.use('*', (req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use(errLogger);
+app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT, () => {
