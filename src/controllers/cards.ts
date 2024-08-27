@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import ForbiddenError from '../errors/forbiddenError';
 import Card from '../models/card';
 import NotFoundError from '../errors/notFoundError';
 import BadRequestError from '../errors/badRequestError';
@@ -8,8 +9,14 @@ export const getCards = (req: Request, res: Response, next: NextFunction) => Car
   .catch(next);
 
 export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
-  Card.findByIdAndDelete(req.params.cardId)
+  Card.findById(req.params.cardId)
     .orFail(() => new NotFoundError('Карточка с указанным _id не найдена'))
+    .then((card) => {
+      if (card.owner.toString() !== req.user?._id?.toString()) {
+        throw new ForbiddenError('Попытка удалить чужую карточку.');
+      }
+    })
+    .then(() => Card.findByIdAndDelete(req.params.cardId))
     .then(() => res.send({ message: 'Карточка удалена' }))
     .catch((error) => {
       if (error.name === 'CastError') {
